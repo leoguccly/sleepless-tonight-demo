@@ -1,0 +1,25 @@
+{
+  "$schema": "https://claude.ai/claude-code/settings.schema.json",
+  "agentTeams": {
+    "enabled": true,
+    "defaultModel": "sonnet",
+    "displayMode": "split",
+    "maxTeammates": 4,
+    "delegationMode": false
+  },
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "Bash(flutter *)",
+      "Bash(dart *)",
+      "Bash(supabase *)",
+      "Bash(git *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)"
+    ]
+  },
+  "mcpServers": {}
+}
