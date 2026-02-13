@@ -36,7 +36,7 @@ async function main() {
           category: product.category,
         },
       });
-    }·
+    }
   }
 
   console.log("Seed completed!");·
