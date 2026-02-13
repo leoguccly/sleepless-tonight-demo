@@ -1,0 +1,162 @@
+// Prisma Schema - Project Pleasure
+// Simplified for SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  activities    Activity[]
+  partners      Partner[]
+  posts         Post[]
+  likes         Like[]
+  reports       Report[]
+  orders        Order[]
+  replies       Reply[]
+}
+
+model Activity {
+  id              String   @id @default(uuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  activityMode    String   @default("partner")
+  partnerId       String?
+  partner         Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  activityDate    DateTime
+  activityTime    DateTime?
+  durationMinutes Int
+  satisfactionScore Int
+  emotionTags     String   @default("[]")
+  encryptedNote   String?
+  encryptionKeyId String?
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Partner {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  nickname    String
+  notes       String?
+  colorTag    String?
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  activities  Activity[]
+
+  @@unique([userId, nickname])
+}
+
+model Post {
+  id                  String   @id @default(uuid())
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  anonymousId         String   @default(uuid())
+  anonymousAvatarSeed String
+  content             String
+  postType            String
+  moderationStatus    String   @default("pending")
+  likesCount          Int      @default(0)
+  repliesCount        Int      @default(0)
+  deletedAt           DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  likes               Like[]
+  reports             Report[]
+  replies             Reply[]
+}
+
+model Reply {
+  id                  String   @id @default(uuid())
+  postId              String
+  post                Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  anonymousAvatarSeed String
+  content             String
+  createdAt           DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Report {
+  id         String   @id @default(uuid())
+  reporterId String?
+  reporter   User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  postId     String?
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reason     String
+  description String?
+  status     String   @default("pending")
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model Product {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  price      Int
+  rating     Float
+  reviews    Int
+  image      String
+  category   String      @default("推荐")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+}
+
+model Order {
+  id                  String      @id @default(uuid())
+  userId              String?
+  user                User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderNumber         String      @unique
+  totalAmount         Int
+  shippingName        String
+  shippingPhone       String
+  shippingAddress     String
+  shippingMethod      String      @default("home_delivery")
+  paymentMethod       String      @default("credit_card")
+  status              String      @default("pending")
+  paidAt              DateTime?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
+  trackingNumber      String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  items               OrderItem[]
+}
+
+model OrderItem {
+  id           String  @id @default(uuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    Int
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String
+  productPrice Int
+  productImage String
+  quantity     Int
+  subtotal     Int
+  createdAt    DateTime @default(now())
+}
