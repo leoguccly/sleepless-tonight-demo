@@ -39,7 +39,7 @@ async function main() {
     }
   }
 
-  console.log("Seed completed!");·
+  console.log("Seed completed!");
 }
 
 main()
