@@ -1,0 +1,8 @@
+[[redirects]]
+  from = "/*"
+  to = "/.next/server/pages/:splat"
+  status = 200
+
+[build]
+  command = "npm run build"
+  publish = ".next"
